@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package bruteforce;
+
+service BruteforceService {
+    rpc Authorization(AuthRequest) returns (Response) {}
+    rpc ResetBucket (BucketRequest) returns (Response) {}
+    rpc AddToBlacklist(BlackList) returns (BlackList) {}
+    rpc DeleteToBlacklist(BlackList) returns (BlackList) {}
+    rpc AddToWhitelist(WhiteList) returns (WhiteList) {}
+    rpc DeleteToWhitelist(WhiteList) returns (WhiteList) {}
+}
+
+message AuthRequest {
+    string login = 1;
+    string password = 2;
+    string ip = 3;
+}
+
+message BucketRequest{
+    string login = 1;
+    string ip = 2;
+}
+
+message BlackList{
+    string ip = 1;
+}
+message WhiteList{
+    string ip = 1;
+}
+
+message Response{
+    bool ok = 1;
+}
