@@ -1,4 +1,4 @@
-module root
+module 	github.com/ivanbatutin921/Anti-bruteforce
 
 go 1.22.2
 

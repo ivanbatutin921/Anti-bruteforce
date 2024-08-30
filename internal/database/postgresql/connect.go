@@ -26,7 +26,7 @@ func Connect() error {
 
 	db, err := gorm.Open(postgres.New(postgres.Config{
 		DSN:                  dsn,
-		PreferSimpleProtocol: true, // Add this line
+		PreferSimpleProtocol: true, 
 	}), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)

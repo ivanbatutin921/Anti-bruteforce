@@ -8,7 +8,6 @@ import(
 
 func Run() {
 	db.Connect()
-	//db.GetPreparedStatements(db.DB.DB)
 	db.MigrateModels(db.DB.DB)
 	config.LoadEnvVars()
 }

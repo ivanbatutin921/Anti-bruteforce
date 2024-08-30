@@ -1,31 +1,27 @@
 package postgresql
 
 import (
-	"fmt"
-	"reflect"
+	"log"
 	model "root/internal/models"
 
 	"gorm.io/gorm"
 )
 
-func MigrateModels(db *gorm.DB) error {
+func MigrateModels(db *gorm.DB) {
 	//db.Set("gorm:prepareStmt", false)
 
 	models := []interface{}{
 		&model.Auth{},
+		&model.WhiteList{},
+		&model.BlackList{},
 	}
 
-	var errs []error
 	for _, model := range models {
 		if !db.Migrator().HasTable(model) {
-			tableName := db.NamingStrategy.TableName(reflect.TypeOf(model).Elem().Name())
-			stmt := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (...)", tableName)
-			err := db.Exec(stmt).Error
-			if err != nil {
-				errs = append(errs, err)
-			}
+			log.Printf("миграция для модели %T", model)
+			db.AutoMigrate(model)
+		} else {
+			log.Printf("Таблица для модели %T уже существует, миграция пропущена", model)
 		}
 	}
-
-	return nil
 }
