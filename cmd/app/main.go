@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"root/internal/app"
 )
 
-func main(){
-	fmt.Print("Hello World")
+func main() {
+	app.Run()
 }

@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+option go_package = "github.com/ivanbatutin921/Anti-bruteforce/blob/main/internal/transport/grpc/bruteforce.proto";
+
 package bruteforce;
 
 service BruteforceService {
