@@ -1,9 +1,12 @@
 package services
 
 import (
+	"errors"
 	"math"
 	"sync"
 	"time"
+
+	pb "github.com/ivanbatutin921/Anti-bruteforce/internal/protobuf"
 )
 
 type TokenBucketManager struct {
@@ -47,7 +50,6 @@ func (tb *TokenBucket) Take(ip string, tokens int32) bool {
 	return false
 }
 
-
 func NewTokenBucketManager() *TokenBucketManager {
 	return &TokenBucketManager{
 		tokenBuckets: make(map[string]map[string]*TokenBucket),
@@ -55,15 +57,41 @@ func NewTokenBucketManager() *TokenBucketManager {
 	}
 }
 
-func (tbManager *TokenBucketManager) AddBucketMemory(login, ip string, tb *TokenBucket) {
+func (tbManager *TokenBucketManager) AddBucketMemory(req *pb.AuthRequest, tb *TokenBucket) error {
+	if tbManager == nil {
+		return errors.New("TokenBucketManager is nil")
+	}
 	tbManager.mu.Lock()
 	defer tbManager.mu.Unlock()
-	loginBuckets, ok := tbManager.tokenBuckets[login]
+	loginBuckets, ok := tbManager.tokenBuckets[req.Login]
 	if !ok {
 		loginBuckets = make(map[string]*TokenBucket)
-		tbManager.tokenBuckets[login] = loginBuckets
+		tbManager.tokenBuckets[req.Login] = loginBuckets
 	}
-	loginBuckets[ip] = tb
+	if _, ok := loginBuckets[req.Ip]; ok {
+		return errors.New("TokenBucket with same login and ip already exists")
+	}
+	loginBuckets[req.Ip] = tb
+	return nil
+}
+
+func (tbManager *TokenBucketManager) ResetBucket(req *pb.BucketRequest) error {
+	tbManager.mu.Lock()
+	defer tbManager.mu.Unlock()
+	if loginBuckets, ok := tbManager.tokenBuckets[req.Login]; ok {
+		if bucket, ok := loginBuckets[req.Ip]; ok {
+			bucket.mu.Lock()
+			bucket.tokens = bucket.capacity
+			bucket.lastReset = time.Now()
+			bucket.mu.Unlock()
+			delete(loginBuckets, req.Ip)
+			if len(loginBuckets) == 0 {
+				delete(tbManager.tokenBuckets, req.Login)
+			}
+			return nil
+		}
+	}
+	return errors.New("TokenBucket with login and ip not found")
 }
 
 func min(a, b int32) int32 {

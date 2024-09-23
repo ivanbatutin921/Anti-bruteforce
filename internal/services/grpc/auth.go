@@ -3,23 +3,31 @@ package grpc
 import (
 	"context"
 
-	models "github.com/ivanbatutin921/Anti-bruteforce/internal/models"
-
 	db "github.com/ivanbatutin921/Anti-bruteforce/internal/database/postgresql"
+	models "github.com/ivanbatutin921/Anti-bruteforce/internal/models"
 	pb "github.com/ivanbatutin921/Anti-bruteforce/internal/protobuf"
 	service "github.com/ivanbatutin921/Anti-bruteforce/internal/services"
 )
 
 type Server struct {
 	pb.UnimplementedBruteforceServiceServer
-	tokenBuckets map[string]*service.TokenBucket
+	tbManager *service.TokenBucketManager
+}
+
+func NewServer() *Server {
+	return &Server{
+		tbManager: service.NewTokenBucketManager(),
+	}
 }
 
 func (s *Server) Authorization(ctx context.Context, req *pb.AuthRequest) (*pb.Response, error) {
-
 	tb := service.NewTokenbucket(3, 10.0) // 1 запрос в 10 секунд
 	tbManager := service.NewTokenBucketManager()
-	tbManager.AddBucketMemory(req.Login, req.Ip, tb)
+
+	err := tbManager.AddBucketMemory(req, tb)
+	if err != nil {
+		return &pb.Response{Ok: false}, err
+	}
 
 	flag := service.CheckIp(req.Ip)
 	if !flag {
@@ -37,23 +45,24 @@ func (s *Server) Authorization(ctx context.Context, req *pb.AuthRequest) (*pb.Re
 	}
 
 	if err := db.CheckLogin(&db.PostgreSQLDB{}, &auth); err != nil {
-		return &pb.Response{Ok: false}, nil
+		return &pb.Response{Ok: false}, err
 	}
 
 	if err := db.CreateUser(&db.PostgreSQLDB{}, &auth); err != nil {
-		return &pb.Response{Ok: false}, nil
+		return &pb.Response{Ok: false}, err
 	}
 
 	return &pb.Response{Ok: true}, nil
 }
 
-func (s *Server) ResetBucket(ctx context.Context, req *pb.BucketRequest) (*pb.Response, error) {
-	key := req.Login + req.Ip
-	tb, ok := s.tokenBuckets[key]
-	if !ok {
-		return &pb.Response{Ok: false}, nil
+func (s *Server) ResetBucket(ctx context.Context, req *pb.AuthRequest) (*pb.Response, error) {
+	bucketReq := &pb.BucketRequest{
+		Login: req.Login,
+		Ip:    req.Ip,
 	}
-	tb.Reset()
-	delete(s.tokenBuckets, key)
+	err := s.tbManager.ResetBucket(bucketReq)
+	if err != nil {
+		return &pb.Response{Ok: false}, err
+	}
 	return &pb.Response{Ok: true}, nil
 }
