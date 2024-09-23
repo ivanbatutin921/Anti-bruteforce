@@ -2,7 +2,7 @@ package main
 
 import (
 	// sr "root/internal/services"
-	"root/internal/app"
+	"github.com/ivanbatutin921/Anti-bruteforce/internal/app"
 )
 
 func main() {

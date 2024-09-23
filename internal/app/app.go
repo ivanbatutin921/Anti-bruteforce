@@ -1,13 +1,13 @@
 package app
 
 import(
-	db "root/internal/database/postgresql"
-	config "root/internal/config"
+	config "github.com/ivanbatutin921/Anti-bruteforce/internal/config"
+	db "github.com/ivanbatutin921/Anti-bruteforce/internal/database/postgresql"
+
 	
 )
 
 func Run() {
-	db.Connect()
-	db.MigrateModels(db.DB.DB)
 	config.LoadEnvVars()
+	db.Init(config.Cfg)	
 }
