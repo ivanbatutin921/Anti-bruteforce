@@ -1,3 +1,5 @@
+
+
 package services
 
 import (
@@ -6,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	pb "github.com/ivanbatutin921/Anti-bruteforce/internal/protobuf"
+	pb "github.com/ivanbatutin921/Anti-bruteforce/mk/internal/protobuf"
 )
 
 type TokenBucketManager struct {

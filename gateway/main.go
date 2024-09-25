@@ -4,8 +4,8 @@ import (
 	"log"
 
 	routes "github.com/ivanbatutin921/Anti-bruteforce/gateway/routes"
-	pb "github.com/ivanbatutin921/Anti-bruteforce/internal/protobuf"
-
+	pb "github.com/ivanbatutin921/Anti-bruteforce/mk/internal/protobuf"
+	
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"google.golang.org/grpc"
@@ -27,9 +27,9 @@ func (s *Server) runGrpcServer() {
 }
 
 func (s *Server) allRoutes() {
-	chatHandler := routes.ServiceHandler(s.mk)
+	bruteforce := routes.ServiceHandler(s.mk)
 
-	s.app.Get("/stream", chatHandler.HandleChatStream)
+	s.app.Post("/auth", bruteforce.Authorization)
 
 	s.app.Get("/hello", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")

@@ -3,7 +3,7 @@ package postgresql
 import (
 	"log"
 
-	"github.com/ivanbatutin921/Anti-bruteforce/internal/models"
+	"github.com/ivanbatutin921/Anti-bruteforce/mk/internal/models"
 )
 
 func (db *PostgreSQLDB) Migrations() error {

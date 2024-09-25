@@ -3,10 +3,10 @@ package grpc
 import (
 	"context"
 
-	db "github.com/ivanbatutin921/Anti-bruteforce/internal/database/postgresql"
-	models "github.com/ivanbatutin921/Anti-bruteforce/internal/models"
-	pb "github.com/ivanbatutin921/Anti-bruteforce/internal/protobuf"
-	service "github.com/ivanbatutin921/Anti-bruteforce/internal/services"
+	db "github.com/ivanbatutin921/Anti-bruteforce/mk/internal/database/postgresql"
+	models "github.com/ivanbatutin921/Anti-bruteforce/mk/internal/models"
+	pb "github.com/ivanbatutin921/Anti-bruteforce/mk/internal/protobuf"
+	service "github.com/ivanbatutin921/Anti-bruteforce/mk/internal/services"
 )
 
 type Server struct {

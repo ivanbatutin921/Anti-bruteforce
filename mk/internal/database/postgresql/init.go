@@ -1,7 +1,7 @@
 package postgresql
 
 import (
-	"github.com/ivanbatutin921/Anti-bruteforce/internal/config"
+	"github.com/ivanbatutin921/Anti-bruteforce/mk/internal/config"
 )
 
 func Init(cfg config.BruteForceConfig) (*PostgreSQLDB, error) {

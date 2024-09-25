@@ -1,8 +1,8 @@
 package services
 
 import (
-	db "github.com/ivanbatutin921/Anti-bruteforce/internal/database/postgresql"
-	"github.com/ivanbatutin921/Anti-bruteforce/internal/models"
+	db "github.com/ivanbatutin921/Anti-bruteforce/mk/internal/database/postgresql"
+	"github.com/ivanbatutin921/Anti-bruteforce/mk/internal/models"
 )
 
 func CheckIp(ip string) bool {

@@ -1,8 +1,8 @@
 package postgresql
 
 import (
-	"github.com/ivanbatutin921/Anti-bruteforce/internal/config"
-	model "github.com/ivanbatutin921/Anti-bruteforce/internal/models"
+	"github.com/ivanbatutin921/Anti-bruteforce/mk/internal/config"
+	model "github.com/ivanbatutin921/Anti-bruteforce/mk/internal/models"
 	"gorm.io/gorm"
 )
 

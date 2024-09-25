@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/ivanbatutin921/Anti-bruteforce/internal/config"
-	"github.com/ivanbatutin921/Anti-bruteforce/internal/models"
+	"github.com/ivanbatutin921/Anti-bruteforce/mk/internal/config"
+	"github.com/ivanbatutin921/Anti-bruteforce/mk/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
