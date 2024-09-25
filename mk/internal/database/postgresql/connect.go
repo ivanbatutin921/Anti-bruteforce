@@ -55,8 +55,54 @@ func CheckLogin(db *PostgreSQLDB, user *models.Auth) error {
 	return nil
 }
 
+func CheckIp(db *PostgreSQLDB, ip string) (bool, error) {
+    err := db.db.Where("ip = ?", ip).First(&models.BlackList{}).Error
+    if err == gorm.ErrRecordNotFound {
+        return false, err
+    }
+    return true, nil
+}
+
 func CreateUser(db *PostgreSQLDB, user *models.Auth) error {
 	err := db.db.Create(user).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func DeleteBlackList(db *PostgreSQLDB, ip string) error {
+	err := db.db.Where("ip = ?", ip).Delete(&models.BlackList{}).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func CreateBlackList(db *PostgreSQLDB, bl *models.BlackList) error {
+	blackList := models.BlackList{
+		Ip: bl.Ip,
+	}
+	err := db.db.Create(&blackList).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func CreateWhiteList(db *PostgreSQLDB, wl *models.WhiteList) error {
+	whiteList := models.WhiteList{
+		Ip: wl.Ip,
+	}
+	err := db.db.Create(&whiteList).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func DeleteWhiteList(db *PostgreSQLDB, ip string) error {
+	err := db.db.Where("ip = ?", ip).Delete(&models.WhiteList{}).Error
 	if err != nil {
 		return err
 	}

@@ -2,16 +2,13 @@ package services
 
 import (
 	db "github.com/ivanbatutin921/Anti-bruteforce/mk/internal/database/postgresql"
-	"github.com/ivanbatutin921/Anti-bruteforce/mk/internal/models"
 )
 
 func CheckIp(ip string) bool {
-
-	var blackList models.BlackList
-	db.DB.Where("ip = ?", ip).First(&blackList)
-	if blackList.ID != 0 {
-		return false
+	bool, err := db.CheckIp(&db.PostgreSQLDB{}, ip)
+	if err != nil {
+		return bool
 	}
-	
-	return true
+
+	return bool
 }

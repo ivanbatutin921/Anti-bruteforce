@@ -3,7 +3,7 @@ package routes
 import (
 	"context"
 
-	pb "github.com/ivanbatutin921/Anti-bruteforce/mk/internal/protobuf"
+	pb "github.com/ivanbatutin921/Anti-bruteforce/protobuf"
 
 	"github.com/gofiber/fiber/v2"
 )
