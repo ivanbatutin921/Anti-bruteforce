@@ -26,7 +26,7 @@ type GRPCCongif struct{}
 var Cfg BruteForceConfig
 
 func LoadEnvVars() BruteForceConfig {
-	if err := godotenv.Load("../../../.env"); err != nil {
+	if err := godotenv.Load(".env"); err != nil {
 		log.Fatalf(err.Error())
 	}
 
