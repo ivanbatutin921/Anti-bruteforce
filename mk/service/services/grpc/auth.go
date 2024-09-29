@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 
-	database "github.com/ivanbatutin921/Anti-bruteforce/mk/internal/database/postgresql"
-	models "github.com/ivanbatutin921/Anti-bruteforce/mk/internal/models"
-	service "github.com/ivanbatutin921/Anti-bruteforce/mk/internal/services"
+	database "github.com/ivanbatutin921/Anti-bruteforce/mk/service/database/postgresql"
+	models "github.com/ivanbatutin921/Anti-bruteforce/mk/service/models"
+	service "github.com/ivanbatutin921/Anti-bruteforce/mk/service/services"
 	pb "github.com/ivanbatutin921/Anti-bruteforce/protobuf"
 )
 

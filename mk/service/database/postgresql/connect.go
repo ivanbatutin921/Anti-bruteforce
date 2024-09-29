@@ -5,8 +5,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/ivanbatutin921/Anti-bruteforce/mk/internal/config"
-	"github.com/ivanbatutin921/Anti-bruteforce/mk/internal/models"
+	"github.com/ivanbatutin921/Anti-bruteforce/mk/service/config"
+	"github.com/ivanbatutin921/Anti-bruteforce/mk/service/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

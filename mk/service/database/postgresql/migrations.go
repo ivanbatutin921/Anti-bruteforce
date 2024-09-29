@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/ivanbatutin921/Anti-bruteforce/mk/internal/models"
+	"github.com/ivanbatutin921/Anti-bruteforce/mk/service/models"
 )
 
 func (db *PostgreSQLDB) Migrations() error {
