@@ -1,9 +1,8 @@
-
-
 package services
 
 import (
 	"errors"
+	"log"
 	"math"
 	"sync"
 	"time"
@@ -34,7 +33,14 @@ func NewTokenbucket(capacity int32, rate float64) *TokenBucket {
 	}
 }
 
-func (tb *TokenBucket) Take(ip string, tokens int32) bool {
+func NewTokenBucketManager() *TokenBucketManager {
+	return &TokenBucketManager{
+		tokenBuckets: make(map[string]map[string]*TokenBucket),
+		mu:           sync.Mutex{},
+	}
+}
+
+func (tb *TokenBucket) Take() bool {
 	tb.mu.Lock()
 	defer tb.mu.Unlock()
 
@@ -44,7 +50,9 @@ func (tb *TokenBucket) Take(ip string, tokens int32) bool {
 	tb.tokens = min(tb.tokens, tb.capacity)
 	tb.lastReset = now.Add(0)
 
-	if tb.tokens > 0 {
+	log.Println(tb.tokens)
+
+	if tb.tokens >= 1 {
 		tb.tokens--
 		return true
 	}
@@ -52,11 +60,30 @@ func (tb *TokenBucket) Take(ip string, tokens int32) bool {
 	return false
 }
 
-func NewTokenBucketManager() *TokenBucketManager {
-	return &TokenBucketManager{
-		tokenBuckets: make(map[string]map[string]*TokenBucket),
-		mu:           sync.Mutex{},
+func AddToken(tb *TokenBucket) {
+	ticker := time.NewTicker(time.Second * 5)
+	for range ticker.C {
+		tb.mu.Unlock()
+		tb.tokens++
+		tb.mu.Lock()
 	}
+}
+
+func (tbManager *TokenBucketManager) GetBucket(login string, ip string) (*TokenBucket, error) {
+	tbManager.mu.Lock()
+	defer tbManager.mu.Unlock()
+	loginBuckets, ok := tbManager.tokenBuckets[login]
+	if !ok {
+		// If the loginBuckets map doesn't exist, create a new one
+		loginBuckets = make(map[string]*TokenBucket)
+		tbManager.tokenBuckets[login] = loginBuckets
+	}
+	bucket, ok := loginBuckets[ip]
+	if !ok {
+		log.Printf("bucket not found for ip %s\n", ip)
+		return nil, errors.New("TokenBucket with login and ip not found")
+	}
+	return bucket, nil
 }
 
 func (tbManager *TokenBucketManager) AddBucketMemory(req *pb.AuthRequest, tb *TokenBucket) error {

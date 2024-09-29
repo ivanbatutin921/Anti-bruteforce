@@ -1,9 +1,9 @@
 package postgresql
 
 import (
-	"errors"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/ivanbatutin921/Anti-bruteforce/mk/internal/config"
 	"github.com/ivanbatutin921/Anti-bruteforce/mk/internal/models"
@@ -16,6 +16,7 @@ type PostgreSQLDB struct {
 }
 
 func (db *PostgreSQLDB) Connect(cfg config.BruteForceConfig) error {
+	start := time.Now()
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 		cfg.PGHOST, cfg.PGUSER, cfg.PGPASSWORD, cfg.PGDATABASE, cfg.PGPORT)
 
@@ -30,7 +31,10 @@ func (db *PostgreSQLDB) Connect(cfg config.BruteForceConfig) error {
 		return err
 	}
 
-	log.Println("Успешное подключение к базе данных PostgreSQL")
+	log.Println(db.db)
+
+	elapsed := time.Since(start)
+	log.Println("Успешное подключение к базе данных PostgreSQL. Время: ", elapsed)
 	return nil
 }
 
@@ -46,24 +50,29 @@ func (db *PostgreSQLDB) Close() {
 	}
 }
 
-func CheckLogin(db *PostgreSQLDB, user *models.Auth) error {
+func (db *PostgreSQLDB) CheckLogin(user *models.Auth) (*models.Auth, error) {
 	var auth models.Auth
 	db.db.Where("login = ?", user.Login).First(&auth)
 	if auth.ID != 0 {
-		return errors.New("пользователь уже существует")
+		return &auth, nil
 	}
-	return nil
+	return nil, nil // no error if user does not exist
 }
 
-func CheckIp(db *PostgreSQLDB, ip string) (bool, error) {
-    err := db.db.Where("ip = ?", ip).First(&models.BlackList{}).Error
-    if err == gorm.ErrRecordNotFound {
-        return false, err
-    }
-    return true, nil
+func (db *PostgreSQLDB) CheckIp(ip string) bool {
+	if db.db == nil {
+		log.Println("db object is not initialized")
+		return false
+	}
+	err := db.db.Where("ip = ?", ip).First(&models.BlackList{}).Error
+	if err == gorm.ErrRecordNotFound {
+		log.Println(err)
+		return false
+	}
+	return true
 }
 
-func CreateUser(db *PostgreSQLDB, user *models.Auth) error {
+func (db *PostgreSQLDB) CreateUser(user *models.Auth) error {
 	err := db.db.Create(user).Error
 	if err != nil {
 		return err
@@ -71,7 +80,7 @@ func CreateUser(db *PostgreSQLDB, user *models.Auth) error {
 	return nil
 }
 
-func DeleteBlackList(db *PostgreSQLDB, ip string) error {
+func (db *PostgreSQLDB) DeleteBlackList(ip string) error {
 	err := db.db.Where("ip = ?", ip).Delete(&models.BlackList{}).Error
 	if err != nil {
 		return err
@@ -79,7 +88,7 @@ func DeleteBlackList(db *PostgreSQLDB, ip string) error {
 	return nil
 }
 
-func CreateBlackList(db *PostgreSQLDB, bl *models.BlackList) error {
+func (db *PostgreSQLDB) CreateBlackList(bl *models.BlackList) error {
 	blackList := models.BlackList{
 		Ip: bl.Ip,
 	}
@@ -90,7 +99,7 @@ func CreateBlackList(db *PostgreSQLDB, bl *models.BlackList) error {
 	return nil
 }
 
-func CreateWhiteList(db *PostgreSQLDB, wl *models.WhiteList) error {
+func (db *PostgreSQLDB) CreateWhiteList(wl *models.WhiteList) error {
 	whiteList := models.WhiteList{
 		Ip: wl.Ip,
 	}
@@ -101,7 +110,7 @@ func CreateWhiteList(db *PostgreSQLDB, wl *models.WhiteList) error {
 	return nil
 }
 
-func DeleteWhiteList(db *PostgreSQLDB, ip string) error {
+func (db *PostgreSQLDB) DeleteWhiteList(ip string) error {
 	err := db.db.Where("ip = ?", ip).Delete(&models.WhiteList{}).Error
 	if err != nil {
 		return err

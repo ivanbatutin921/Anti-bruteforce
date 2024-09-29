@@ -1,19 +1,23 @@
 package postgresql
 
 import (
+	"log"
+
 	"github.com/ivanbatutin921/Anti-bruteforce/mk/internal/config"
 )
 
+var DBDB = &PostgreSQLDB{}
+
 func Init(cfg config.BruteForceConfig) (*PostgreSQLDB, error) {
-	db := &PostgreSQLDB{}
-	err := db.Connect(cfg)
+	var err error
+	err = DBDB.Connect(cfg)
 	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := DBDB.Migrations(); err != nil {
 		return nil, err
 	}
 
-	if err := db.Migrations(); err != nil {
-		return nil, err
-	}
-
-	return db, nil
+	return DBDB, nil
 }
