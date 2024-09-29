@@ -1,13 +1,13 @@
 package tests
 
-import (
-	
-	"os"
-	"testing"
-)
+// import (
 
-func TestMain(m *testing.M) {
-	tests.InitDB()
-	defer tests.CloseDB()
-	os.Exit(m.Run())
-}
+// 	"os"
+// 	"testing"
+// )
+
+// func TestMain(m *testing.M) {
+// 	tests.InitDB()
+// 	defer tests.CloseDB()
+// 	os.Exit(m.Run())
+// }

@@ -8,7 +8,7 @@ import(
 	
 )
 
-func Run() {
+func APp() {
 	config.LoadEnvVars()
 	db.Init(config.Cfg)	
 	grpc.ListenGRPC()

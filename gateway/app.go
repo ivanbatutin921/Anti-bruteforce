@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"context"
@@ -65,7 +65,7 @@ func (s *Server) Run() {
 	log.Fatal(s.app.Listen(":" + s.port))
 }
 
-func main() {
+func App() {
 	s := NewServer("3000")
 	s.Run()
 }
