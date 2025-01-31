@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/ivanbatutin921/Anti-bruteforce/blob/main/internal/transport/grpc/bruteforce.proto";
+option go_package = "github.com/ivanbatutin921/Anti-bruteforce/mk/service/protobuf/bruteforce.proto";
 
 package bruteforce;
 

@@ -4,10 +4,12 @@ import (
 	"context"
 	"log"
 
-	database "github.com/ivanbatutin921/Anti-bruteforce/mk/service/database/postgresql"
+	database "github.com/ivanbatutin921/Anti-bruteforce/mk/service/database"
 	models "github.com/ivanbatutin921/Anti-bruteforce/mk/service/models"
+	"github.com/ivanbatutin921/Anti-bruteforce/mk/service/pkg/logger"
+	pb "github.com/ivanbatutin921/Anti-bruteforce/mk/service/protobuf"
 	service "github.com/ivanbatutin921/Anti-bruteforce/mk/service/services"
-	pb "github.com/ivanbatutin921/Anti-bruteforce/protobuf"
+	"gorm.io/gorm"
 )
 
 var db = database.DBDB
@@ -16,18 +18,20 @@ var manager = service.NewTokenBucketManager()
 type Server struct {
 	pb.UnimplementedBruteforceServiceServer
 	tbManager *service.TokenBucketManager
+	logger    *logger.Logger
+	db        *gorm.DB
 }
 
-// RegisterService implements grpc.ServiceRegistrar.
-// func (s *Server) RegisterService(desc *grpc.ServiceDesc, impl any) {
-// 	panic("unimplemented")
-// }
-
-func NewServer() *Server {
+func NewServer(db *gorm.DB, logger *logger.Logger) *Server {
 	return &Server{
 		tbManager: service.NewTokenBucketManager(),
+		logger:    logger,
+		db:        db,
 	}
 }
+
+
+
 
 func (s *Server) Authorization(ctx context.Context, req *pb.AuthRequest) (*pb.Response, error) {
 	tbManager := manager
@@ -45,7 +49,7 @@ func (s *Server) Authorization(ctx context.Context, req *pb.AuthRequest) (*pb.Re
 		}
 	}
 
-	flag := db.CheckIp(req.Ip)
+	flag := s.CheckIp(req.Ip)
 	if !flag {
 		return &pb.Response{Ok: false}, nil
 	}
@@ -61,7 +65,7 @@ func (s *Server) Authorization(ctx context.Context, req *pb.AuthRequest) (*pb.Re
 		Ip:       req.Ip,
 	}
 
-	existingUser, err := db.CheckLogin(&models.Auth{Login: req.Login})
+	existingUser, err := s.CheckLogin(&models.Auth{Login: req.Login})
 	if err != nil {
 		log.Println(err.Error())
 		return &pb.Response{Ok: false}, err
@@ -76,7 +80,7 @@ func (s *Server) Authorization(ctx context.Context, req *pb.AuthRequest) (*pb.Re
 		}
 	} else {
 		// User does not exist, create new user
-		if err := db.CreateUser(&auth); err != nil {
+		if err := s.CreateUser(&auth); err != nil {
 			log.Println(err.Error())
 			return &pb.Response{Ok: false}, err
 		}
@@ -97,7 +101,7 @@ func (s *Server) AddToWhitelist(ctx context.Context, req *pb.WhiteList) (*pb.Whi
 	whiteList := models.WhiteList{
 		Ip: req.Ip,
 	}
-	err := db.CreateWhiteList(&whiteList)
+	err := s.CreateWhiteList(&whiteList)
 	if err != nil {
 		return &pb.WhiteList{Ip: ""}, err
 	}
@@ -105,7 +109,7 @@ func (s *Server) AddToWhitelist(ctx context.Context, req *pb.WhiteList) (*pb.Whi
 }
 
 func (s *Server) DeleteToWhitelist(ctx context.Context, req *pb.WhiteList) (*pb.WhiteList, error) {
-	err := db.DeleteWhiteList(req.Ip)
+	err := s.DeleteWhiteList(req.Ip)
 	if err != nil {
 		return &pb.WhiteList{Ip: ""}, err
 	}
@@ -116,7 +120,7 @@ func (s *Server) AddToBlacklist(ctx context.Context, req *pb.BlackList) (*pb.Bla
 	blackList := models.BlackList{
 		Ip: req.Ip,
 	}
-	err := db.CreateBlackList(&blackList)
+	err := s.CreateBlackList(&blackList)
 	if err != nil {
 		return &pb.BlackList{Ip: ""}, err
 	}
@@ -124,7 +128,7 @@ func (s *Server) AddToBlacklist(ctx context.Context, req *pb.BlackList) (*pb.Bla
 }
 
 func (s *Server) DeleteToBlacklist(ctx context.Context, req *pb.BlackList) (*pb.BlackList, error) {
-	err := db.DeleteBlackList(req.Ip)
+	err := s.DeleteBlackList(req.Ip)
 	if err != nil {
 		return &pb.BlackList{Ip: ""}, err
 	}

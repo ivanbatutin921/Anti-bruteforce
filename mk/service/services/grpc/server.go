@@ -4,7 +4,7 @@ import (
 	"log"
 	"net"
 
-	pb "github.com/ivanbatutin921/Anti-bruteforce/protobuf"
+	pb "github.com/ivanbatutin921/Anti-bruteforce/mk/service/protobuf"
 	"google.golang.org/grpc"
 )
 

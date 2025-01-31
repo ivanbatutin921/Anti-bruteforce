@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	pb "github.com/ivanbatutin921/Anti-bruteforce/protobuf"
+	pb "github.com/ivanbatutin921/Anti-bruteforce/mk/service/protobuf"
 )
 
 type TokenBucketManager struct {
